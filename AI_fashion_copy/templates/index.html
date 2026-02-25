@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Fashion Copy Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8f9fb;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: black;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            margin-top: 15px;
+        }
+
+        .output-box {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            margin-bottom: 15px;
+        }
+
+        .copy-btn {
+            background: #333;
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            width: auto;
+        }
+
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>AI Conversion Copy for Shopify Fashion Brands</h1>
+
+    <div class="card">
+        <form id="copyForm">
+            <input type="text" id="productName" placeholder="Product Name" required />
+            <textarea id="features" placeholder="Features" required></textarea>
+            <input type="text" id="audience" placeholder="Target Audience" required />
+            <button type="submit">Generate Copy</button>
+        </form>
+    </div>
+
+    <div id="loading" class="loading" style="display:none;">
+        Generating high-converting copy...
+    </div>
+
+    <div id="outputCard" class="card" style="display:none;">
+        <div class="section-title">Product Description</div>
+        <button class="copy-btn" onclick="copyText('desc')">Copy</button>
+        <div id="desc" class="output-box"></div>
+
+        <div class="section-title">Ad Variations</div>
+        <button class="copy-btn" onclick="copyText('ads')">Copy</button>
+        <div id="ads" class="output-box"></div>
+
+        <div class="section-title">Email</div>
+        <button class="copy-btn" onclick="copyText('email')">Copy</button>
+        <div id="email" class="output-box"></div>
+    </div>
+</div>
+
+<script>
+document.getElementById("copyForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    document.getElementById("loading").style.display = "block";
+    document.getElementById("outputCard").style.display = "none";
+
+    const response = await fetch("/generate", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            productName: document.getElementById("productName").value,
+            features: document.getElementById("features").value,
+            audience: document.getElementById("audience").value
+        })
+    });
+
+    const data = await response.json();
+
+    document.getElementById("loading").style.display = "none";
+
+    if (data.product_description) {
+        document.getElementById("desc").innerText = data.product_description;
+        document.getElementById("ads").innerText = data.ads.join("\n\n");
+        document.getElementById("email").innerText =
+            "Subject: " + data.email_subject + "\n\n" + data.email_body;
+
+        document.getElementById("outputCard").style.display = "block";
+    }
+});
+
+function copyText(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text);
+    alert("Copied!");
+}
+</script>
+
+</body>
+</html>
