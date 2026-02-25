@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Fashion Copy Generator</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+        input, textarea, button {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+        }
+        button {
+            background: black;
+            color: white;
+            cursor: pointer;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+<h1>AI Shopify Fashion Copy Generator</h1>
+
+<form id="copyForm">
+    <input type="text" id="productName" placeholder="Product Name" required />
+    <textarea id="features" placeholder="Features" required></textarea>
+    <input type="text" id="audience" placeholder="Target Audience" required />
+    <button type="submit">Generate Copy</button>
+</form>
+
+<h2>Output:</h2>
+<pre id="result"></pre>
+
+<script>
+document.getElementById("copyForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    document.getElementById("result").innerText = "Generating...";
+
+    const response = await fetch("/generate", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            productName: document.getElementById("productName").value,
+            features: document.getElementById("features").value,
+            audience: document.getElementById("audience").value
+        })
+    });
+
+    const data = await response.json();
+
+    if (data.output) {
+        document.getElementById("result").innerText = data.output;
+    } else {
+        document.getElementById("result").innerText = "Error: " + data.error;
+    }
+});
+</script>
+
+</body>
+</html>
